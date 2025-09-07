@@ -3,332 +3,1754 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BUMDes Gunung Mulia - Website Resmi</title>
+    <title>Sistem Administrasi BUMDES - Desa Sejahtera</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.8.2/docx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .sidebar-transition {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-hover::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .card-hover:hover::before {
+            left: 100%;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .notification-badge {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .letter-template {
+            border: 2px dashed #e5e7eb;
+            transition: all 0.3s ease;
+            background: linear-gradient(45deg, #f3f4f6 25%, transparent 25%, transparent 75%, #f3f4f6 75%, #f3f4f6),
+                        linear-gradient(45deg, #f3f4f6 25%, transparent 25%, transparent 75%, #f3f4f6 75%, #f3f4f6);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+        }
+
+        .letter-template:hover {
+            border-color: var(--primary);
+            background: linear-gradient(45deg, #eef2ff 25%, transparent 25%, transparent 75%, #eef2ff 75%, #eef2ff),
+                        linear-gradient(45deg, #eef2ff 25%, transparent 25%, transparent 75%, #eef2ff 75%, #eef2ff);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-item {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 0.3s ease;
+        }
+
+        .nav-item:hover::after,
+        .nav-item.active::after {
+            width: 100%;
+        }
+
+        .interactive-chart {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .chart-tooltip {
+            position: absolute;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .structure-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .structure-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(-30px, -30px) rotate(180deg); }
+        }
+
+        .vision-mission-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .time-display {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .smooth-transition {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .letter-item {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .letter-item:hover {
+            border-left-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .print-button {
+            background: linear-gradient(135deg, var(--success), var(--info));
+            transition: all 0.3s ease;
+        }
+
+        .print-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+        }
+    </style>
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div class="container">
-            <div class="logo">
-                <img src="assets/logo.png" alt="BUMDes Gunung Mulia">
-                <h1>BUMDes Gunung Mulia</h1>
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="index.html" class="active">Beranda</a></li>
-                    <li><a href="tentang.html">Tentang Kami</a></li>
-                    <li><a href="struktur.html">Struktur Kepengurusan</a></li>
-                    <li><a href="layanan.html">Layanan</a></li>
-                    <li><a href="berita.html">Berita</a></li>
-                    <li><a href="galeri.html">Galeri</a></li>
-                    <li><a href="kontak.html">Kontak</a></li>
-                </ul>
-            </nav>
-            <div class="admin-btn">
-                <a href="admin/login.php"><i class="fas fa-user-lock"></i> Admin</a>
+    <!-- Sidebar -->
+    <div id="sidebar" class="fixed left-0 top-0 h-full w-64 bg-white/95 backdrop-blur-sm shadow-2xl z-40 sidebar-transition">
+        <div class="p-6 border-b bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                    <i class="fas fa-building text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-xl">BUMDES</h1>
+                    <p class="text-xs opacity-90">Desa Sejahtera</p>
+                </div>
             </div>
         </div>
-    </header>
+        
+        <nav class="p-4">
+            <a href="#" onclick="showPage('dashboard')" class="nav-item active flex items-center space-x-3 p-3 rounded-lg hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 mb-2 smooth-transition">
+                <i class="fas fa-home w-5"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" onclick="showPage('visimisi')" class="nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 mb-2 smooth-transition">
+                <i class="fas fa-bullseye w-5"></i>
+                <span>Visi & Misi</span>
+            </a>
+            <a href="#" onclick="showPage('struktur')" class="nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 mb-2 smooth-transition">
+                <i class="fas fa-sitemap w-5"></i>
+                <span>Struktur Organisasi</span>
+            </a>
+            <a href="#" onclick="showPage('surat')" class="nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 mb-2 smooth-transition">
+                <i class="fas fa-envelope w-5"></i>
+                <span>Surat Menyurat</span>
+                <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full notification-badge">3</span>
+            </a>
+            <a href="#" onclick="showPage('keuangan')" class="nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 mb-2 smooth-transition">
+                <i class="fas fa-money-bill-wave w-5"></i>
+                <span>Keuangan</span>
+            </a>
+            <a href="#" onclick="showPage('aset')" class="nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 mb-2 smooth-transition">
+                <i class="fas fa-box w-5"></i>
+                <span>Aset</span>
+            </a>
+            <a href="#" onclick="showPage('laporan')" class="nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 mb-2 smooth-transition">
+                <i class="fas fa-chart-bar w-5"></i>
+                <span>Laporan</span>
+            </a>
+            <a href="#" onclick="showPage('pengguna')" class="nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 mb-2 smooth-transition">
+                <i class="fas fa-users w-5"></i>
+                <span>Pengguna</span>
+            </a>
+            <a href="#" onclick="showPage('pengaturan')" class="nav-item flex items-center space-x-3 p-3 rounded-lg hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 mb-2 smooth-transition">
+                <i class="fas fa-cog w-5"></i>
+                <span>Pengaturan</span>
+            </a>
+        </nav>
+        
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t bg-white/90 backdrop-blur-sm">
+            <div class="flex items-center space-x-3">
+                <img src="https://picsum.photos/seed/user1/40/40" alt="User" class="w-10 h-10 rounded-full ring-2 ring-indigo-500">
+                <div class="flex-1">
+                    <p class="font-medium text-sm">Ahmad Fauzi</p>
+                    <p class="text-xs text-gray-500">Administrator</p>
+                </div>
+                <button onclick="logout()" class="text-gray-400 hover:text-gray-600 smooth-transition">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </div>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="slider">
-            <div class="slide active" style="background-image: url('assets/slide1.jpg');">
-                <div class="container">
-                    <h2>Mewujudkan Kesejahteraan Bersama</h2>
-                    <p>Badan Usaha Milik Desa Gunung Mulia hadir untuk memajukan ekonomi masyarakat</p>
-                    <a href="tentang.html" class="btn">Pelajari Lebih Lanjut</a>
+    <!-- Main Content -->
+    <div class="ml-64 min-h-screen">
+        <!-- Header -->
+        <header class="bg-white/90 backdrop-blur-sm shadow-sm border-b sticky top-0 z-30">
+            <div class="flex items-center justify-between p-4">
+                <button onclick="toggleSidebar()" class="lg:hidden text-gray-600">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                <div class="flex items-center space-x-6">
+                    <div class="time-display text-xl font-bold" id="currentTime"></div>
+                    <div class="relative">
+                        <input type="text" placeholder="Cari..." class="pl-10 pr-4 py-2 border rounded-full focus:outline-none focus:border-indigo-500 smooth-transition">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    </div>
+                    <button class="relative text-gray-600 hover:text-gray-800 smooth-transition">
+                        <i class="fas fa-bell text-xl"></i>
+                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">5</span>
+                    </button>
                 </div>
             </div>
-            <div class="slide" style="background-image: url('assets/slide2.jpg');">
-                <div class="container">
-                    <h2>Layanan Terbaik untuk Masyarakat</h2>
-                    <p>Berbagai layanan dan produk berkualitas untuk memenuhi kebutuhan Anda</p>
-                    <a href="layanan.html" class="btn">Lihat Layanan</a>
-                </div>
-            </div>
-            <div class="slide" style="background-image: url('assets/slide3.jpg');">
-                <div class="container">
-                    <h2>Bergabung Bersama Kami</h2>
-                    <p>Wujudkan potensi diri Anda dan kembangkan usaha bersama BUMDes</h2>
-                    <a href="kontak.html" class="btn">Hubungi Kami</a>
-                </div>
-            </div>
-        </div>
-        <div class="slider-controls">
-            <span class="prev"><i class="fas fa-chevron-left"></i></span>
-            <span class="next"><i class="fas fa-chevron-right"></i></span>
-        </div>
-    </section>
+        </header>
 
-    <!-- Statistik -->
-    <section class="stats">
-        <div class="container">
-            <div class="stat-item">
-                <i class="fas fa-users"></i>
-                <h3>500+</h3>
-                <p>Masyarakat Terbantu</p>
-            </div>
-            <div class="stat-item">
-                <i class="fas fa-handshake"></i>
-                <h3>20+</h3>
-                <p>Mitra Kerjasama</p>
-            </div>
-            <div class="stat-item">
-                <i class="fas fa-store"></i>
-                <h3>15</h3>
-                <p>Unit Usaha</p>
-            </div>
-            <div class="stat-item">
-                <i class="fas fa-award"></i>
-                <h3>5</h3>
-                <p>Penghargaan</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Visi Misi -->
-    <section class="visi-misi">
-        <div class="container">
-            <div class="section-title">
-                <h2>Visi & Misi</h2>
-                <div class="divider"></div>
-            </div>
-            <div class="vm-content">
-                <div class="visi">
-                    <div class="icon">
-                        <i class="fas fa-eye"></i>
-                    </div>
-                    <h3>Visi</h3>
-                    <p>Terwujudnya BUMDes Gunung Mulia sebagai motor penggerak ekonomi masyarakat yang mandiri, inovatif, dan berkelanjutan pada tahun 2030.</p>
-                </div>
-                <div class="misi">
-                    <div class="icon">
-                        <i class="fas fa-bullseye"></i>
-                    </div>
-                    <h3>Misi</h3>
-                    <ul>
-                        <li>Mengembangkan potensi ekonomi desa melalui pemberdayaan masyarakat</li>
-                        <li>Menyediakan layanan dan produk berkualitas untuk memenuhi kebutuhan masyarakat</li>
-                        <li>Membangun jaringan kerjasama yang luas dengan berbagai pihak</li>
-                        <li>Menerapkan prinsip good governance dalam pengelolaan BUMDes</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Layanan Unggulan -->
-    <section class="layanan-unggulan">
-        <div class="container">
-            <div class="section-title">
-                <h2>Layanan Unggulan</h2>
-                <div class="divider"></div>
-            </div>
-            <div class="layanan-grid">
-                <div class="layanan-item">
-                    <div class="icon">
-                        <i class="fas fa-shopping-cart"></i>
-                    </div>
-                    <h3>Toko Desa</h3>
-                    <p>Menyediakan berbagai kebutuhan pokok dan produk lokal dengan harga terjangkau</p>
-                    <a href="layanan.html#toko" class="btn-small">Detail</a>
-                </div>
-                <div class="layanan-item">
-                    <div class="icon">
-                        <i class="fas fa-money-bill-wave"></i>
-                    </div>
-                    <h3>Lembaga Keuangan Mikro</h3>
-                    <p>Memberikan akses permodalan bagi pelaku usaha mikro dan kecil di desa</p>
-                    <a href="layanan.html#lkm" class="btn-small">Detail</a>
-                </div>
-                <div class="layanan-item">
-                    <div class="icon">
-                        <i class="fas fa-truck"></i>
-                    </div>
-                    <h3>Jasa Transportasi</h3>
-                    <p>Layanan transportasi untuk mendukung mobilitas masyarakat dan distribusi produk</p>
-                    <a href="layanan.html#transportasi" class="btn-small">Detail</a>
-                </div>
-                <div class="layanan-item">
-                    <div class="icon">
-                        <i class="fas fa-wifi"></i>
-                    </div>
-                    <h3>Internet Desa</h3>
-                    <p>Menyediakan akses internet murah untuk mendukung aktivitas digital masyarakat</p>
-                    <a href="layanan.html#internet" class="btn-small">Detail</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Berita Terkini -->
-    <section class="berita-terkini">
-        <div class="container">
-            <div class="section-title">
-                <h2>Berita Terkini</h2>
-                <div class="divider"></div>
-            </div>
-            <div class="berita-grid">
-                <div class="berita-item">
-                    <div class="berita-img">
-                        <img src="assets/berita1.jpg" alt="Pelatihan Kewirausahaan">
-                    </div>
-                    <div class="berita-content">
-                        <div class="berita-meta">
-                            <span><i class="fas fa-calendar"></i> 15 Mei 2023</span>
-                            <span><i class="fas fa-user"></i> Admin</span>
+        <!-- Dashboard Page -->
+        <div id="dashboard-page" class="page-content p-6">
+            <h2 class="text-3xl font-bold mb-6 gradient-text">Dashboard</h2>
+            
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-2xl shadow-xl p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                            <i class="fas fa-envelope text-white text-xl"></i>
                         </div>
-                        <h3>Pelatihan Kewirausahaan untuk Pemuda Desa</h3>
-                        <p>BUMDes Gunung Mulia mengadakan pelatihan kewirausahaan untuk 50 pemuda desa guna meningkatkan skill dan wawasan dalam berbisnis...</p>
-                        <a href="berita-detail.html" class="btn-small">Baca Selengkapnya</a>
+                        <span class="text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">+12%</span>
                     </div>
+                    <h3 class="text-3xl font-bold text-gray-800">156</h3>
+                    <p class="text-gray-600 text-sm">Total Surat</p>
                 </div>
-                <div class="berita-item">
-                    <div class="berita-img">
-                        <img src="assets/berita2.jpg" alt="Pembukaan Toko Baru">
-                    </div>
-                    <div class="berita-content">
-                        <div class="berita-meta">
-                            <span><i class="fas fa-calendar"></i> 5 Mei 2023</span>
-                            <span><i class="fas fa-user"></i> Admin</span>
+                
+                <div class="bg-white rounded-2xl shadow-xl p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-14 h-14 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                            <i class="fas fa-money-bill-wave text-white text-xl"></i>
                         </div>
-                        <h3>Peresmian Toko Desa Cabang Kedua</h3>
-                        <p>Setelah sukses dengan toko pertama, BUMDes Gunung Mulia kembali meresmikan toko cabang kedua untuk memudahkan akses masyarakat...</p>
-                        <a href="berita-detail.html" class="btn-small">Baca Selengkapnya</a>
+                        <span class="text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">+8%</span>
                     </div>
+                    <h3 class="text-3xl font-bold text-gray-800">Rp 45.2M</h3>
+                    <p class="text-gray-600 text-sm">Total Pendapatan</p>
                 </div>
-                <div class="berita-item">
-                    <div class="berita-img">
-                        <img src="assets/berita3.jpg" alt="Kerjasama dengan Bank">
-                    </div>
-                    <div class="berita-content">
-                        <div class="berita-meta">
-                            <span><i class="fas fa-calendar"></i> 28 April 2023</span>
-                            <span><i class="fas fa-user"></i> Admin</span>
+                
+                <div class="bg-white rounded-2xl shadow-xl p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-14 h-14 bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                            <i class="fas fa-box text-white text-xl"></i>
                         </div>
-                        <h3>Penandatanganan MoU dengan Bank BRI</h3>
-                        <p>BUMDes Gunung Mulia menjalin kerjasama dengan Bank BRI untuk memperluas akses permodalan bagi pelaku usaha di desa...</p>
-                        <a href="berita-detail.html" class="btn-small">Baca Selengkapnya</a>
+                        <span class="text-sm bg-red-100 text-red-800 px-3 py-1 rounded-full font-medium">-2%</span>
                     </div>
+                    <h3 class="text-3xl font-bold text-gray-800">89</h3>
+                    <p class="text-gray-600 text-sm">Total Aset</p>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-xl p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-14 h-14 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
+                            <i class="fas fa-users text-white text-xl"></i>
+                        </div>
+                        <span class="text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">+5%</span>
+                    </div>
+                    <h3 class="text-3xl font-bold text-gray-800">24</h3>
+                    <p class="text-gray-600 text-sm">Total Pengguna</p>
                 </div>
             </div>
-            <div class="text-center">
-                <a href="berita.html" class="btn">Lihat Semua Berita</a>
+
+            <!-- Interactive Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div class="bg-white rounded-2xl shadow-xl p-6 interactive-chart">
+                    <h3 class="text-xl font-semibold mb-4 gradient-text">Grafik Pendapatan Interaktif</h3>
+                    <canvas id="revenueChart" height="300"></canvas>
+                    <div class="chart-tooltip" id="revenueTooltip"></div>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-xl p-6 interactive-chart">
+                    <h3 class="text-xl font-semibold mb-4 gradient-text">Distribusi Surat</h3>
+                    <canvas id="letterChart" height="300"></canvas>
+                    <div class="chart-tooltip" id="letterTooltip"></div>
+                </div>
+            </div>
+
+            <!-- Recent Activities -->
+            <div class="bg-white rounded-2xl shadow-xl p-6">
+                <h3 class="text-xl font-semibold mb-4 gradient-text">Aktivitas Terkini</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-4 p-4 hover:bg-gray-50 rounded-xl smooth-transition cursor-pointer">
+                        <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
+                            <i class="fas fa-envelope text-white"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium text-gray-800">Surat Permohonan Izin Usaha</p>
+                            <p class="text-sm text-gray-500">Dibuat oleh Budi Santoso - 2 jam yang lalu</p>
+                        </div>
+                        <span class="text-xs bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full font-medium">Menunggu</span>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4 p-4 hover:bg-gray-50 rounded-xl smooth-transition cursor-pointer">
+                        <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg">
+                            <i class="fas fa-check text-white"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium text-gray-800">Laporan Keuangan Bulanan</p>
+                            <p class="text-sm text-gray-500">Disetujui oleh Kepala Desa - 5 jam yang lalu</p>
+                        </div>
+                        <span class="text-xs bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">Disetujui</span>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4 p-4 hover:bg-gray-50 rounded-xl smooth-transition cursor-pointer">
+                        <div class="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+                            <i class="fas fa-box text-white"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium text-gray-800">Penambahan Aset Baru</p>
+                            <p class="text-sm text-gray-500">Komputer Desktop - 1 hari yang lalu</p>
+                        </div>
+                        <span class="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium">Selesai</span>
+                    </div>
+                </div>
             </div>
         </div>
-    </section>
 
-    <!-- Testimoni -->
-    <section class="testimoni">
-        <div class="container">
-            <div class="section-title">
-                <h2>Apa Kata Masyarakat</h2>
-                <div class="divider"></div>
+        <!-- Visi Misi Page -->
+        <div id="visimisi-page" class="page-content p-6 hidden">
+            <h2 class="text-3xl font-bold mb-6 gradient-text">Visi & Misi BUMDES</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="vision-mission-card rounded-2xl shadow-xl p-8 card-hover">
+                    <div class="flex items-center mb-6">
+                        <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                            <i class="fas fa-eye text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold ml-4">Visi</h3>
+                    </div>
+                    <p class="text-lg leading-relaxed opacity-90">
+                        "Terwujudnya BUMDES Desa Sejahtera sebagai motor penggerak ekonomi desa yang mandiri, inovatif, dan berkelanjutan untuk mewujudkan kesejahteraan masyarakat."
+                    </p>
+                    <div class="mt-6 flex items-center space-x-2">
+                        <i class="fas fa-quote-left opacity-50"></i>
+                        <p class="text-sm opacity-75 italic">Menciptakan desa yang maju dan sejahtera</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-xl p-8 card-hover">
+                    <div class="flex items-center mb-6">
+                        <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                            <i class="fas fa-bullseye text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold ml-4 gradient-text">Misi</h3>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="text-indigo-600 font-bold text-sm">1</span>
+                            </div>
+                            <p class="text-gray-700">Mengembangkan usaha ekonomi produktif berbasis potensi lokal desa</p>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="text-indigo-600 font-bold text-sm">2</span>
+                            </div>
+                            <p class="text-gray-700">Meningkatkan kualitas sumber daya manusia melalui pelatihan dan pendampingan</p>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="text-indigo-600 font-bold text-sm">3</span>
+                            </div>
+                            <p class="text-gray-700">Membangun jaringan kemitraan dengan pihak eksternal untuk pengembangan usaha</p>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="text-indigo-600 font-bold text-sm">4</span>
+                            </div>
+                            <p class="text-gray-700">Menerapkan sistem manajemen yang transparan, akuntabel, dan profesional</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="testimoni-slider">
-                <div class="testimoni-item active">
-                    <div class="testimoni-content">
-                        <i class="fas fa-quote-left"></i>
-                        <p>"Terima kasih BUMDes Gunung Mulia, dengan adanya pinjaman modal usaha, saya bisa mengembangkan usaha kerajinan tangan yang selama ini menjadi impian saya."</p>
-                        <div class="testimoni-author">
-                            <img src="assets/testimoni1.jpg" alt="Ibu Siti">
+            
+            <div class="mt-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl shadow-xl p-8 text-white">
+                <h3 class="text-2xl font-bold mb-4">Nilai-Nilai Dasar</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3 backdrop-blur-sm">
+                            <i class="fas fa-handshake text-white text-3xl"></i>
+                        </div>
+                        <h4 class="font-semibold mb-2">Integritas</h4>
+                        <p class="text-sm opacity-90">Jujur dan bertanggung jawab dalam setiap tindakan</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3 backdrop-blur-sm">
+                            <i class="fas fa-lightbulb text-white text-3xl"></i>
+                        </div>
+                        <h4 class="font-semibold mb-2">Inovasi</h4>
+                        <p class="text-sm opacity-90">Selalu mencari cara baru untuk berkembang</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3 backdrop-blur-sm">
+                            <i class="fas fa-users text-white text-3xl"></i>
+                        </div>
+                        <h4 class="font-semibold mb-2">Kolaborasi</h4>
+                        <p class="text-sm opacity-90">Bekerja sama untuk mencapai tujuan bersama</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Struktur Organisasi Page -->
+        <div id="struktur-page" class="page-content p-6 hidden">
+            <h2 class="text-3xl font-bold mb-6 gradient-text">Struktur Organisasi</h2>
+            
+            <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+                <div class="text-center mb-8">
+                    <div class="inline-block">
+                        <div class="structure-card rounded-2xl p-6 shadow-2xl mb-4">
+                            <img src="https://picsum.photos/seed/direktur/80/80" alt="Direktur" class="w-20 h-20 rounded-full mx-auto mb-3 border-4 border-white/50">
+                            <h3 class="text-xl font-bold">Drs. Ahmad Fauzi</h3>
+                            <p class="text-sm opacity-90">Direktur Utama</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="text-center">
+                        <div class="structure-card rounded-xl p-6 shadow-xl">
+                            <img src="https://picsum.photos/seed/manager1/60/60" alt="Manager" class="w-16 h-16 rounded-full mx-auto mb-3 border-3 border-white/50">
+                            <h4 class="font-semibold">Siti Nurhaliza</h4>
+                            <p class="text-sm opacity-90">Manager Keuangan</p>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <div class="structure-card rounded-xl p-6 shadow-xl">
+                            <img src="https://picsum.photos/seed/manager2/60/60" alt="Manager" class="w-16 h-16 rounded-full mx-auto mb-3 border-3 border-white/50">
+                            <h4 class="font-semibold">Budi Santoso</h4>
+                            <p class="text-sm opacity-90">Manager Operasional</p>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <div class="structure-card rounded-xl p-6 shadow-xl">
+                            <img src="https://picsum.photos/seed/manager3/60/60" alt="Manager" class="w-16 h-16 rounded-full mx-auto mb-3 border-3 border-white/50">
+                            <h4 class="font-semibold">Dewi Lestari</h4>
+                            <p class="text-sm opacity-90">Manager Pemasaran</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="text-center">
+                        <div class="bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg p-4 text-white shadow-lg">
+                            <i class="fas fa-user-tie text-2xl mb-2"></i>
+                            <h5 class="font-medium text-sm">Staff Keuangan</h5>
+                            <p class="text-xs opacity-90">3 Orang</p>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <div class="bg-gradient-to-br from-green-400 to-green-600 rounded-lg p-4 text-white shadow-lg">
+                            <i class="fas fa-cogs text-2xl mb-2"></i>
+                            <h5 class="font-medium text-sm">Staff Operasional</h5>
+                            <p class="text-xs opacity-90">5 Orang</p>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <div class="bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg p-4 text-white shadow-lg">
+                            <i class="fas fa-bullhorn text-2xl mb-2"></i>
+                            <h5 class="font-medium text-sm">Staff Pemasaran</h5>
+                            <p class="text-xs opacity-90">4 Orang</p>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <div class="bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg p-4 text-white shadow-lg">
+                            <i class="fas fa-laptop text-2xl mb-2"></i>
+                            <h5 class="font-medium text-sm">Staff IT</h5>
+                            <p class="text-xs opacity-90">2 Orang</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <h3 class="text-xl font-semibold mb-6 gradient-text">Tugas & Tanggung Jawab</h3>
+                <div class="space-y-6">
+                    <div class="border-l-4 border-indigo-500 pl-6">
+                        <h4 class="font-semibold text-lg mb-2">Direktur Utama</h4>
+                        <ul class="text-gray-600 space-y-1">
+                            <li>• Memimpin dan mengarahkan seluruh kegiatan BUMDES</li>
+                            <li>• Bertanggung jawab atas kinerja BUMDES secara keseluruhan</li>
+                            <li>• Mewakili BUMDES dalam forum eksternal</li>
+                        </ul>
+                    </div>
+                    <div class="border-l-4 border-green-500 pl-6">
+                        <h4 class="font-semibold text-lg mb-2">Manager Keuangan</h4>
+                        <ul class="text-gray-600 space-y-1">
+                            <li>• Mengelola keuangan dan pembukuan BUMDES</li>
+                            <li>• Membuat laporan keuangan berkala</li>
+                            <li>• Mengatur perencanaan anggaran</li>
+                        </ul>
+                    </div>
+                    <div class="border-l-4 border-purple-500 pl-6">
+                        <h4 class="font-semibold text-lg mb-2">Manager Operasional</h4>
+                        <ul class="text-gray-600 space-y-1">
+                            <li>• Mengkoordinasikan kegiatan operasional harian</li>
+                            <li>• Mengelola sumber daya dan aset BUMDES</li>
+                            <li>• Memastikan kelancaran proses bisnis</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Surat Menyurat Page -->
+        <div id="surat-page" class="page-content p-6 hidden">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-3xl font-bold gradient-text">Surat Menyurat</h2>
+                <button onclick="quickAddLetter()" class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-6 py-3 rounded-xl hover:shadow-lg smooth-transition flex items-center space-x-2">
+                    <i class="fas fa-plus"></i>
+                    <span>Tambah Surat Cepat</span>
+                </button>
+            </div>
+
+            <!-- Quick Add Form -->
+            <div id="quickAddForm" class="hidden bg-white rounded-2xl shadow-xl p-6 mb-6">
+                <h3 class="text-lg font-semibold mb-4">Tambah Surat Baru</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Surat</label>
+                        <select id="quickLetterType" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500">
+                            <option value="izin">Surat Izin Usaha</option>
+                            <option value="keterangan">Surat Keterangan</option>
+                            <option value="permohonan">Surat Permohonan</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nama Pemohon</label>
+                        <input type="text" id="quickApplicantName" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500" placeholder="Nama pemohon">
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="processQuickAdd()" class="w-full bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-lg hover:shadow-lg smooth-transition">
+                            <i class="fas fa-check mr-2"></i>Tambahkan
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Tabs -->
+            <div class="bg-white rounded-2xl shadow-xl mb-6">
+                <div class="border-b">
+                    <nav class="flex space-x-8 px-6">
+                        <button onclick="filterLetters('all')" class="filter-tab py-4 border-b-2 border-indigo-600 text-indigo-600 font-medium smooth-transition">Semua</button>
+                        <button onclick="filterLetters('pending')" class="filter-tab py-4 border-b-2 border-transparent text-gray-600 hover:text-gray-800 smooth-transition">Menunggu</button>
+                        <button onclick="filterLetters('approved')" class="filter-tab py-4 border-b-2 border-transparent text-gray-600 hover:text-gray-800 smooth-transition">Disetujui</button>
+                        <button onclick="filterLetters('rejected')" class="filter-tab py-4 border-b-2 border-transparent text-gray-600 hover:text-gray-800 smooth-transition">Ditolak</button>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Letters List -->
+            <div class="bg-white rounded-2xl shadow-xl">
+                <div class="p-4 border-b">
+                    <div class="flex items-center space-x-4">
+                        <input type="text" placeholder="Cari surat..." class="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500">
+                        <select class="px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500">
+                            <option>Semua Jenis</option>
+                            <option>Surat Izin</option>
+                            <option>Surat Keterangan</option>
+                            <option>Surat Permohonan</option>
+                        </select>
+                        <button class="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 smooth-transition">
+                            <i class="fas fa-filter"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="lettersList" class="divide-y">
+                    <!-- Letters will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Keuangan Page -->
+        <div id="keuangan-page" class="page-content p-6 hidden">
+            <h2 class="text-3xl font-bold mb-6 gradient-text">Keuangan</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                <div class="bg-white rounded-2xl shadow-xl p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-14 h-14 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                            <i class="fas fa-wallet text-white text-xl"></i>
+                        </div>
+                        <span class="text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">+5%</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800">Saldo Kas</h3>
+                    <p class="text-3xl font-bold text-green-600 mt-2">Rp 125.450.000</p>
+                    <p class="text-sm text-gray-500 mt-1">Per 15 November 2024</p>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-xl p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                            <i class="fas fa-chart-line text-white text-xl"></i>
+                        </div>
+                        <span class="text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">+12%</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800">Pendapatan Bulan Ini</h3>
+                    <p class="text-3xl font-bold text-blue-600 mt-2">Rp 45.200.000</p>
+                    <p class="text-sm text-gray-500 mt-1">+12% dari bulan lalu</p>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-xl p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-14 h-14 bg-gradient-to-br from-red-400 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
+                            <i class="fas fa-shopping-cart text-white text-xl"></i>
+                        </div>
+                        <span class="text-sm bg-red-100 text-red-800 px-3 py-1 rounded-full font-medium">-5%</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800">Pengeluaran Bulan Ini</h3>
+                    <p class="text-3xl font-bold text-red-600 mt-2">Rp 32.100.000</p>
+                    <p class="text-sm text-gray-500 mt-1">-5% dari bulan lalu</p>
+                </div>
+            </div>
+
+            <!-- Transaction Table -->
+            <div class="bg-white rounded-2xl shadow-xl">
+                <div class="p-4 border-b flex items-center justify-between">
+                    <h3 class="text-lg font-semibold gradient-text">Transaksi Terkini</h3>
+                    <button class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-2 rounded-lg hover:shadow-lg smooth-transition text-sm">
+                        <i class="fas fa-plus mr-2"></i>Tambah Transaksi
+                    </button>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Keterangan</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategori</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Debit</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Kredit</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr class="hover:bg-gray-50 smooth-transition">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">15 Nov 2024</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">Penjualan Hasil Bumi</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">Pendapatan</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-green-600">Rp 5.000.000</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-right">-</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
+                                    <button class="text-blue-600 hover:text-blue-800 smooth-transition"><i class="fas fa-eye"></i></button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 smooth-transition">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">14 Nov 2024</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">Pembelian Pupuk</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <span class="px-2 py-1 text-xs bg-red-100 text-red-800 rounded">Pengeluaran</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-right">-</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-red-600">Rp 2.500.000</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
+                                    <button class="text-blue-600 hover:text-blue-800 smooth-transition"><i class="fas fa-eye"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aset Page -->
+        <div id="aset-page" class="page-content p-6 hidden">
+            <h2 class="text-3xl font-bold mb-6 gradient-text">Manajemen Aset</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <div class="bg-white rounded-2xl shadow-xl p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <i class="fas fa-tractor text-4xl text-blue-600"></i>
+                        <span class="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium">12 Unit</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-800">Alat Pertanian</h3>
+                    <p class="text-sm text-gray-500 mt-1">Nilai: Rp 85.000.000</p>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-xl p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <i class="fas fa-building text-4xl text-green-600"></i>
+                        <span class="text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">3 Unit</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-800">Gudang</h3>
+                    <p class="text-sm text-gray-500 mt-1">Nilai: Rp 450.000.000</p>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-xl p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <i class="fas fa-truck text-4xl text-purple-600"></i>
+                        <span class="text-sm bg-purple-100 text-purple-800 px-3 py-1 rounded-full font-medium">5 Unit</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-800">Kendaraan</h3>
+                    <p class="text-sm text-gray-500 mt-1">Nilai: Rp 325.000.000</p>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-xl p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <i class="fas fa-laptop text-4xl text-orange-600"></i>
+                        <span class="text-sm bg-orange-100 text-orange-800 px-3 py-1 rounded-full font-medium">8 Unit</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-800">Peralatan Kantor</h3>
+                    <p class="text-sm text-gray-500 mt-1">Nilai: Rp 65.000.000</p>
+                </div>
+            </div>
+
+            <!-- Assets Table -->
+            <div class="bg-white rounded-2xl shadow-xl">
+                <div class="p-4 border-b flex items-center justify-between">
+                    <h3 class="text-lg font-semibold gradient-text">Daftar Aset</h3>
+                    <button class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-2 rounded-lg hover:shadow-lg smooth-transition text-sm">
+                        <i class="fas fa-plus mr-2"></i>Tambah Aset
+                    </button>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kode Aset</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Aset</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategori</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tahun Perolehan</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Nilai</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr class="hover:bg-gray-50 smooth-transition">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">AST-001</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">Traktor Tangan</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">Alat Pertanian</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">2022</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-right">Rp 15.000.000</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
+                                    <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">Aktif</span>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 smooth-transition">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">AST-002</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">Gudang Penyimpanan</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">Gudang</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">2021</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-right">Rp 150.000.000</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
+                                    <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">Aktif</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Laporan Page -->
+        <div id="laporan-page" class="page-content p-6 hidden">
+            <h2 class="text-3xl font-bold mb-6 gradient-text">Laporan</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                <div class="bg-white rounded-2xl shadow-xl p-6 card-hover cursor-pointer">
+                    <div class="w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center mb-4 shadow-lg">
+                        <i class="fas fa-file-invoice text-white text-3xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-lg mb-2">Laporan Keuangan</h3>
+                    <p class="text-gray-600 text-sm mb-4">Laporan pendapatan dan pengeluaran bulanan</p>
+                    <button class="text-blue-600 font-medium text-sm hover:text-blue-700 smooth-transition">
+                        Unduh Laporan <i class="fas fa-download ml-1"></i>
+                    </button>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-xl p-6 card-hover cursor-pointer">
+                    <div class="w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center mb-4 shadow-lg">
+                        <i class="fas fa-chart-line text-white text-3xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-lg mb-2">Laporan Pertumbuhan</h3>
+                    <p class="text-gray-600 text-sm mb-4">Analisis pertumbuhan usaha BUMDES</p>
+                    <button class="text-blue-600 font-medium text-sm hover:text-blue-700 smooth-transition">
+                        Unduh Laporan <i class="fas fa-download ml-1"></i>
+                    </button>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-xl p-6 card-hover cursor-pointer">
+                    <div class="w-20 h-20 bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl flex items-center justify-center mb-4 shadow-lg">
+                        <i class="fas fa-box text-white text-3xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-lg mb-2">Laporan Aset</h3>
+                    <p class="text-gray-600 text-sm mb-4">Daftar inventaris dan kondisi aset</p>
+                    <button class="text-blue-600 font-medium text-sm hover:text-blue-700 smooth-transition">
+                        Unduh Laporan <i class="fas fa-download ml-1"></i>
+                    </button>
+                </button>
+                </div>
+            </div>
+
+            <!-- Report Generator -->
+            <div class="bg-white rounded-2xl shadow-xl p-6">
+                <h3 class="text-lg font-semibold mb-4 gradient-text">Buat Laporan Kustom</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Laporan</label>
+                        <select class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500">
+                            <option>Laporan Keuangan</option>
+                            <option>Laporan Aset</option>
+                            <option>Laporan Surat Menyurat</option>
+                            <option>Laporan Aktivitas</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Periode</label>
+                        <select class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500">
+                            <option>Bulan Ini</option>
+                            <option>3 Bulan Terakhir</option>
+                            <option>6 Bulan Terakhir</option>
+                            <option>1 Tahun Terakhir</option>
+                            <option>Kustom</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Format</label>
+                        <select class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500">
+                            <option>PDF</option>
+                            <option>Excel</option>
+                            <option>Word</option>
+                            <option>CSV</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex items-end">
+                        <button class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-2 rounded-lg hover:shadow-lg smooth-transition">
+                            <i class="fas fa-file-export mr-2"></i>Generate Laporan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pengguna Page -->
+        <div id="pengguna-page" class="page-content p-6 hidden">
+            <h2 class="text-3xl font-bold mb-6 gradient-text">Manajemen Pengguna</h2>
+            
+            <div class="bg-white rounded-2xl shadow-xl">
+                <div class="p-4 border-b flex items-center justify-between">
+                    <h3 class="text-lg font-semibold gradient-text">Daftar Pengguna</h3>
+                    <button class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-2 rounded-lg hover:shadow-lg smooth-transition text-sm">
+                        <i class="fas fa-user-plus mr-2"></i>Tambah Pengguna
+                    </button>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr class="hover:bg-gray-50 smooth-transition">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <img src="https://picsum.photos/seed/user1/40/40" alt="User" class="w-10 h-10 rounded-full mr-3 ring-2 ring-indigo-500">
+                                        <div>
+                                            <div class="font-medium">Ahmad Fauzi</div>
+                                            <div class="text-sm text-gray-500">Administrator</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">ahmad@bumdes.desa.id</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <span class="px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded">Admin</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">Aktif</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
+                                    <button class="text-blue-600 hover:text-blue-800 mr-3 smooth-transition"><i class="fas fa-edit"></i></button>
+                                    <button class="text-red-600 hover:text-red-800 smooth-transition"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 smooth-transition">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <img src="https://picsum.photos/seed/user2/40/40" alt="User" class="w-10 h-10 rounded-full mr-3 ring-2 ring-indigo-500">
+                                        <div>
+                                            <div class="font-medium">Siti Nurhaliza</div>
+                                            <div class="text-sm text-gray-500">Staff Keuangan</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">siti@bumdes.desa.id</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">Staff</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">Aktif</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
+                                    <button class="text-blue-600 hover:text-blue-800 mr-3 smooth-transition"><i class="fas fa-edit"></i></button>
+                                    <button class="text-red-600 hover:text-red-800 smooth-transition"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pengaturan Page -->
+        <div id="pengaturan-page" class="page-content p-6 hidden">
+            <h2 class="text-3xl font-bold mb-6 gradient-text">Pengaturan</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
+                        <h3 class="text-lg font-semibold mb-4 gradient-text">Informasi BUMDES</h3>
+                        
+                        <div class="space-y-4">
                             <div>
-                                <h4>Ibu Siti</h4>
-                                <p>Pengrajin Anyaman</p>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Nama BUMDES</label>
+                                <input type="text" value="BUMDES Sejahtera Bersama" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Alamat</label>
+                                <textarea class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500" rows="3">Jl. Desa Sejahtera No. 1, Kec. Sejahtera, Kab. Maju</textarea>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Telepon</label>
+                                    <input type="text" value="(0274) 123456" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                    <input type="email" value="info@bumdes.desa.id" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Logo</label>
+                                <div class="flex items-center space-x-4">
+                                    <img src="https://picsum.photos/seed/logo/100/100" alt="Logo" class="w-20 h-20 rounded-lg shadow-lg">
+                                    <button class="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 smooth-transition">Ganti Logo</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl shadow-xl p-6">
+                        <h3 class="text-lg font-semibold mb-4 gradient-text">Pengaturan Surat</h3>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Format Nomor Surat</label>
+                                <input type="text" value="{kode}/{jenis}/{tahun}" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500">
+                                <p class="text-xs text-gray-500 mt-1">Gunakan {kode}, {jenis}, {bulan}, {tahun} sebagai placeholder</p>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tanda Tangan Digital</label>
+                                <div class="flex items-center space-x-4">
+                                    <img src="https://picsum.photos/seed/signature/200/100" alt="Tanda Tangan" class="border rounded shadow">
+                                    <button class="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 smooth-transition">Upload Tanda Tangan</button>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Template Surat</label>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="letter-template p-4 rounded-lg cursor-pointer">
+                                        <i class="fas fa-file-alt text-2xl text-gray-400 mb-2"></i>
+                                        <p class="font-medium">Surat Izin Usaha</p>
+                                        <p class="text-sm text-gray-500">Template untuk surat izin usaha</p>
+                                    </div>
+                                    <div class="letter-template p-4 rounded-lg cursor-pointer">
+                                        <i class="fas fa-file-alt text-2xl text-gray-400 mb-2"></i>
+                                        <p class="font-medium">Surat Keterangan</p>
+                                        <p class="text-sm text-gray-500">Template untuk surat keterangan</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="testimoni-item">
-                    <div class="testimoni-content">
-                        <i class="fas fa-quote-left"></i>
-                        <p>"Toko Desa sangat membantu, saya tidak perlu jauh-jauh ke kota untuk belanja kebutuhan sehari-hari. Harganya juga terjangkau."</p>
-                        <div class="testimoni-author">
-                            <img src="assets/testimoni2.jpg" alt="Bapak Ahmad">
-                            <div>
-                                <h4>Bapak Ahmad</h4>
-                                <p>Warga Desa</p>
+                
+                <div>
+                    <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
+                        <h3 class="text-lg font-semibold mb-4 gradient-text">Keamanan</h3>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium">Two-Factor Authentication</p>
+                                    <p class="text-sm text-gray-500">Tambahkan keamanan ekstra</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                                </label>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium">Login Notification</p>
+                                    <p class="text-sm text-gray-500">Notifikasi saat login baru</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" checked class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                                </label>
+                            </div>
+                            
+                            <div class="pt-4 border-t">
+                                <button class="w-full bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-lg hover:shadow-lg smooth-transition">
+                                    <i class="fas fa-key mr-2"></i>Ubah Password
+                                </button>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="testimoni-item">
-                    <div class="testimoni-content">
-                        <i class="fas fa-quote-left"></i>
-                        <p>"Internet Desa membuat anak-anak bisa belajar online dengan lancar. Sekarang desa kami tidak ketinggalan informasi lagi."</p>
-                        <div class="testimoni-author">
-                            <img src="assets/testimoni3.jpg" alt="Bapak Hasan">
-                            <div>
-                                <h4>Bapak Hasan</h4>
-                                <p>Kepala Dusun</p>
+                    
+                    <div class="bg-white rounded-2xl shadow-xl p-6">
+                        <h3 class="text-lg font-semibold mb-4 gradient-text">Backup & Restore</h3>
+                        
+                        <div class="space-y-4">
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <p class="font-medium text-blue-900">Backup Terakhir</p>
+                                <p class="text-sm text-blue-700">15 November 2024, 14:30</p>
                             </div>
+                            
+                            <button class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-2 rounded-lg hover:shadow-lg smooth-transition">
+                                <i class="fas fa-download mr-2"></i>Backup Sekarang
+                            </button>
+                            
+                            <button class="w-full bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 smooth-transition">
+                                <i class="fas fa-upload mr-2"></i>Restore dari Backup
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="testimoni-controls">
-                <span class="prev"><i class="fas fa-chevron-left"></i></span>
-                <span class="next"><i class="fas fa-chevron-right"></i></span>
+            
+            <div class="mt-6 flex justify-end">
+                <button class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-6 py-2 rounded-lg hover:shadow-lg smooth-transition">
+                    Simpan Perubahan
+                </button>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-about">
-                    <div class="logo">
-                        <img src="assets/logo-white.png" alt="BUMDes Gunung Mulia">
-                        <h3>BUMDes Gunung Mulia</h3>
-                    </div>
-                    <p>Badan Usaha Milik Desa Gunung Mulia hadir untuk memajukan ekonomi masyarakat melalui berbagai layanan dan produk berkualitas.</p>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-youtube"></i></a>
-                        <a href="#"><i class="fab fa-whatsapp"></i></a>
-                    </div>
-                </div>
-                <div class="footer-links">
-                    <h4>Quick Links</h4>
-                    <ul>
-                        <li><a href="index.html">Beranda</a></li>
-                        <li><a href="tentang.html">Tentang Kami</a></li>
-                        <li><a href="struktur.html">Struktur Kepengurusan</a></li>
-                        <li><a href="layanan.html">Layanan</a></li>
-                        <li><a href="berita.html">Berita</a></li>
-                        <li><a href="kontak.html">Kontak</a></li>
-                    </ul>
-                </div>
-                <div class="footer-contact">
-                    <h4>Kontak Kami</h4>
-                    <ul>
-                        <li><i class="fas fa-map-marker-alt"></i> Jl. Desa No. 1, Gunung Mulia, Kec. Mulya</li>
-                        <li><i class="fas fa-phone"></i> (0274) 123456</li>
-                        <li><i class="fas fa-envelope"></i> info@bumdesgunungmulia.desa.id</li>
-                        <li><i class="fas fa-clock"></i> Senin - Sabtu: 08.00 - 16.00</li>
-                    </ul>
-                </div>
-                <div class="footer-newsletter">
-                    <h4>Newsletter</h4>
-                    <p>Dapatkan informasi terbaru dari kami</p>
-                    <form action="#" method="post">
-                        <input type="email" name="email" placeholder="Email Anda" required>
-                        <button type="submit"><i class="fas fa-paper-plane"></i></button>
-                    </form>
-                </div>
+    <!-- Print Modal -->
+    <div id="printModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b flex items-center justify-between">
+                <h3 class="text-xl font-semibold gradient-text">Cetak Surat</h3>
+                <button onclick="closePrintModal()" class="text-gray-400 hover:text-gray-600 smooth-transition">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
             </div>
-            <div class="footer-bottom">
-                <p>&copy; 2023 BUMDes Gunung Mulia. All Rights Reserved.</p>
-                <p>Designed by <a href="#">Tim IT BUMDes</a></p>
+            
+            <div class="p-6">
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Format</label>
+                    <div class="grid grid-cols-3 gap-4">
+                        <button onclick="printToPDF()" class="p-4 border-2 border-red-500 rounded-lg hover:bg-red-50 smooth-transition">
+                            <i class="fas fa-file-pdf text-red-500 text-2xl mb-2"></i>
+                            <p class="font-medium">PDF</p>
+                        </button>
+                        <button onclick="printToWord()" class="p-4 border-2 border-blue-500 rounded-lg hover:bg-blue-50 smooth-transition">
+                            <i class="fas fa-file-word text-blue-500 text-2xl mb-2"></i>
+                            <p class="font-medium">Word</p>
+                        </button>
+                        <button onclick="printToExcel()" class="p-4 border-2 border-green-500 rounded-lg hover:bg-green-50 smooth-transition">
+                            <i class="fas fa-file-excel text-green-500 text-2xl mb-2"></i>
+                            <p class="font-medium">Excel</p>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="border-t pt-4">
+                    <h4 class="font-medium mb-2">Preview Surat</h4>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div id="letterPreview" class="text-sm">
+                            <!-- Preview content will be inserted here -->
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </footer>
+    </div>
 
-    <script src="script.js"></script>
+    <script>
+        // Global variables
+        let revenueChart, letterChart;
+        let letters = [
+            { id: 1, type: 'izin', number: '001/UMK/IJIN/2024', applicant: 'Ahmad Wijaya', status: 'pending', date: '2 jam yang lalu' },
+            { id: 2, type: 'keterangan', number: '002/SKDU/2024', applicant: 'Siti Nurhaliza', status: 'approved', date: '1 hari yang lalu' },
+            { id: 3, type: 'permohonan', number: '003/PM/BANTUAN/2024', applicant: 'Budi Santoso', status: 'pending', date: '3 jam yang lalu' }
+        ];
+
+        // Update time display
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString('id-ID', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('currentTime').textContent = timeString;
+        }
+
+        // Initialize time display
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // Initialize charts with interactivity
+        function initCharts() {
+            // Revenue Chart with interactivity
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            revenueChart = new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov'],
+                    datasets: [{
+                        label: 'Pendapatan',
+                        data: [35, 38, 40, 42, 45, 43, 46, 48, 45, 47, 45],
+                        borderColor: 'rgb(99, 102, 241)',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        tension: 0.4,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        pointBackgroundColor: 'rgb(99, 102, 241)',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            padding: 12,
+                            cornerRadius: 8,
+                            titleFont: {
+                                size: 14
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Pendapatan: Rp ' + context.parsed.y + ' Juta';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0,0,0,0.05)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return 'Rp ' + value + 'M';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    onHover: (event, activeElements) => {
+                        event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
+                    }
+                }
+            });
+
+            // Letter Distribution Chart with interactivity
+            const letterCtx = document.getElementById('letterChart').getContext('2d');
+            letterChart = new Chart(letterCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Surat Izin', 'Surat Keterangan', 'Surat Permohonan', 'Lainnya'],
+                    datasets: [{
+                        data: [45, 30, 20, 5],
+                        backgroundColor: [
+                            'rgb(99, 102, 241)',
+                            'rgb(16, 185, 129)',
+                            'rgb(251, 146, 60)',
+                            'rgb(156, 163, 175)'
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            padding: 12,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.parsed + '%';
+                                }
+                            }
+                        }
+                    },
+                    onHover: (event, activeElements) => {
+                        event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
+                    }
+                }
+            });
+        }
+
+        // Page navigation with smooth transitions
+        function showPage(pageId) {
+            // Add fade out effect
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.style.opacity = '0';
+                page.style.transform = 'translateY(20px)';
+            });
+            
+            setTimeout(() => {
+                // Hide all pages
+                document.querySelectorAll('.page-content').forEach(page => {
+                    page.classList.add('hidden');
+                    page.style.opacity = '1';
+                    page.style.transform = 'translateY(0)';
+                });
+                
+                // Show selected page with fade in
+                const selectedPage = document.getElementById(pageId + '-page');
+                selectedPage.classList.remove('hidden');
+                selectedPage.style.opacity = '0';
+                selectedPage.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    selectedPage.style.transition = 'all 0.5s ease';
+                    selectedPage.style.opacity = '1';
+                    selectedPage.style.transform = 'translateY(0)';
+                }, 50);
+                
+                // Update active nav
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active', 'bg-indigo-50', 'text-indigo-600');
+                    item.classList.add('text-gray-700');
+                });
+                event.currentTarget.classList.remove('text-gray-700');
+                event.currentTarget.classList.add('active', 'bg-indigo-50', 'text-indigo-600');
+                
+                // Initialize charts if dashboard
+                if (pageId === 'dashboard' && !revenueChart) {
+                    setTimeout(initCharts, 300);
+                }
+                
+                // Load letters if surat page
+                if (pageId === 'surat') {
+                    loadLetters();
+                }
+            }, 300);
+        }
+
+        // Load letters into the list
+        function loadLetters() {
+            const lettersList = document.getElementById('lettersList');
+            lettersList.innerHTML = '';
+            
+            letters.forEach(letter => {
+                const letterItem = document.createElement('div');
+                letterItem.className = 'letter-item p-6 cursor-pointer';
+                letterItem.dataset.status = letter.status;
+                letterItem.onclick = () => openPrintModal(letter);
+                
+                const statusClass = {
+                    'pending': 'bg-yellow-100 text-yellow-800',
+                    'approved': 'bg-green-100 text-green-800',
+                    'rejected': 'bg-red-100 text-red-800'
+                };
+                
+                const statusText = {
+                    'pending': 'Menunggu',
+                    'approved': 'Disetujui',
+                    'rejected': 'Ditolak'
+                };
+                
+                const iconClass = {
+                    'izin': 'text-yellow-600',
+                    'keterangan': 'text-green-600',
+                    'permohonan': 'text-blue-600'
+                };
+                
+                letterItem.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-14 h-14 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center shadow-lg">
+                                <i class="fas fa-file-alt ${iconClass[letter.type]} text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">${getLetterTypeName(letter.type)}</h3>
+                                <p class="text-sm text-gray-500">No: ${letter.number}</p>
+                                <p class="text-sm text-gray-500">Pemohon: ${letter.applicant}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs ${statusClass[letter.status]} px-3 py-1 rounded-full font-medium">${statusText[letter.status]}</span>
+                            <p class="text-sm text-gray-500 mt-2">${letter.date}</p>
+                            <button class="mt-2 print-button text-white px-3 py-1 rounded-lg text-sm">
+                                <i class="fas fa-print mr-1"></i>Cetak
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                lettersList.appendChild(letterItem);
+            });
+        }
+
+        // Get letter type name
+        function getLetterTypeName(type) {
+            const types = {
+                'izin': 'Surat Izin Usaha Mikro',
+                'keterangan': 'Surat Keterangan Domisili Usaha',
+                'permohonan': 'Surat Permohonan Bantuan'
+            };
+            return types[type] || 'Surat Lainnya';
+        }
+
+        // Quick add letter
+        function quickAddLetter() {
+            const form = document.getElementById('quickAddForm');
+            form.classList.toggle('hidden');
+            if (!form.classList.contains('hidden')) {
+                document.getElementById('quickApplicantName').focus();
+            }
+        }
+
+        // Process quick add
+        function processQuickAdd() {
+            const type = document.getElementById('quickLetterType').value;
+            const applicant = document.getElementById('quickApplicantName').value;
+            
+            if (!applicant) {
+                alert('Silakan masukkan nama pemohon');
+                return;
+            }
+            
+            // Generate new letter
+            const newLetter = {
+                id: letters.length + 1,
+                type: type,
+                number: generateLetterNumber(type),
+                applicant: applicant,
+                status: 'pending',
+                date: 'Baru saja'
+            };
+            
+            letters.unshift(newLetter);
+            loadLetters();
+            
+            // Reset form
+            document.getElementById('quickApplicantName').value = '';
+            document.getElementById('quickAddForm').classList.add('hidden');
+            
+            // Show success message
+            showNotification('Surat berhasil ditambahkan!', 'success');
+        }
+
+        // Generate letter number
+        function generateLetterNumber(type) {
+            const date = new Date();
+            const year = date.getFullYear();
+            const sequence = String(letters.length + 1).padStart(3, '0');
+            
+            const typeCodes = {
+                'izin': 'IJIN',
+                'keterangan': 'SKDU',
+                'permohonan': 'PMHN'
+            };
+            
+            const code = typeCodes[type] || 'LAIN';
+            return `${sequence}/${code}/${year}`;
+        }
+
+        // Filter letters
+        function filterLetters(status) {
+            // Update active tab
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('border-indigo-600', 'text-indigo-600');
+                tab.classList.add('border-transparent', 'text-gray-600');
+            });
+            event.currentTarget.classList.remove('border-transparent', 'text-gray-600');
+            event.currentTarget.classList.add('border-indigo-600', 'text-indigo-600');
+            
+            // Filter letter items
+            document.querySelectorAll('.letter-item').forEach(item => {
+                if (status === 'all' || item.dataset.status === status) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Print modal functions
+        function openPrintModal(letter) {
+            const modal = document.getElementById('printModal');
+            const preview = document.getElementById('letterPreview');
+            
+            // Generate preview content
+            preview.innerHTML = `
+                <div class="space-y-4">
+                    <div class="text-center">
+                        <h2 class="text-xl font-bold">BUMDES SEJAHTERA BERSAMA</h2>
+                        <p class="text-sm">Jl. Desa Sejahtera No. 1, Kec. Sejahtera, Kab. Maju</p>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="text-lg font-semibold underline">${getLetterTypeName(letter.type)}</h3>
+                        <p class="text-sm">Nomor: ${letter.number}</p>
+                    </div>
+                    <div class="space-y-2">
+                        <p><strong>Kepada Yth:</strong></p>
+                        <p>${letter.applicant}</p>
+                        <p>Di Tempat</p>
+                    </div>
+                    <div class="space-y-2">
+                        <p>Dengan hormat,</p>
+                        <p>Sehubungan dengan permohonan yang diajukan, dengan ini kami sampaikan bahwa...</p>
+                        <p>[Isi surat otomatis berdasarkan template]</p>
+                    </div>
+                    <div class="mt-8">
+                        <p>Demikian surat ini dibuat untuk digunakan sebagaimana mestinya.</p>
+                    </div>
+                    <div class="flex justify-between mt-8">
+                        <div>
+                            <p>Pemohon,</p>
+                            <br><br><br>
+                            <p><u>${letter.applicant}</u></p>
+                        </div>
+                        <div class="text-right">
+                            <p>Mengetahui,</p>
+                            <p>Kepala Desa Sejahtera</p>
+                            <br><br><br>
+                            <p><u>Drs. Ahmad Fauzi</u></p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.remove('hidden');
+            modal.dataset.letterId = letter.id;
+        }
+
+        function closePrintModal() {
+            document.getElementById('printModal').classList.add('hidden');
+        }
+
+        // Print functions
+        function printToPDF() {
+            const letterId = document.getElementById('printModal').dataset.letterId;
+            const letter = letters.find(l => l.id == letterId);
+            
+            // Create PDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Add content to PDF
+            doc.setFontSize(16);
+            doc.text('BUMDES SEJAHTERA BERSAMA', 105, 20, { align: 'center' });
+            doc.setFontSize(10);
+            doc.text('Jl. Desa Sejahtera No. 1, Kec. Sejahtera, Kab. Maju', 105, 30, { align: 'center' });
+            
+            doc.setFontSize(14);
+            doc.text(getLetterTypeName(letter.type), 105, 50, { align: 'center' });
+            doc.setFontSize(10);
+            doc.text(`Nomor: ${letter.number}`, 105, 60, { align: 'center' });
+            
+            // Save PDF
+            doc.save(`Surat_${letter.number}.pdf`);
+            
+            showNotification('Surat berhasil dicetak ke PDF!', 'success');
+        }
+
+        function printToWord() {
+            const letterId = document.getElementById('printModal').dataset.letterId;
+            const letter = letters.find(l => l.id == letterId);
+            
+            // Create Word document content
+            const content = `
+                <html>
+                <head>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 40px; }
+                        .header { text-align: center; margin-bottom: 30px; }
+                        .title { text-decoration: underline; }
+                        .content { margin: 20px 0; }
+                        .signature { margin-top: 50px; }
+                        .signature-table { width: 100%; }
+                        .signature-table td { width: 50%; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h2>BUMDES SEJAHTERA BERSAMA</h2>
+                        <p>Jl. Desa Sejahtera No. 1, Kec. Sejahtera, Kab. Maju</p>
+                    </div>
+                    
+                    <div class="header">
+                        <h3 class="title">${getLetterTypeName(letter.type)}</h3>
+                        <p>Nomor: ${letter.number}</p>
+                    </div>
+                    
+                    <div class="content">
+                        <p><strong>Kepada Yth:</strong></p>
+                        <p>${letter.applicant}</p>
+                        <p>Di Tempat</p>
+                    </div>
+                    
+                    <div class="content">
+                        <p>Dengan hormat,</p>
+                        <p>Sehubungan dengan permohonan yang diajukan, dengan ini kami sampaikan bahwa...</p>
+                        <p>[Isi surat otomatis berdasarkan template]</p>
+                    </div>
+                    
+                    <div class="content">
+                        <p>Demikian surat ini dibuat untuk digunakan sebagaimana mestinya.</p>
+                    </div>
+                    
+                    <div class="signature">
+                        <table class="signature-table">
+                            <tr>
+                                <td>
+                                    <p>Pemohon,</p>
+                                    <br><br><br>
+                                    <p><u>${letter.applicant}</u></p>
+                                </td>
+                                <td style="text-align: right;">
+                                    <p>Mengetahui,</p>
+                                    <p>Kepala Desa Sejahtera</p>
+                                    <br><br><br>
+                                    <p><u>Drs. Ahmad Fauzi</u></p>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </body>
+                </html>
+            `;
+            
+            // Create blob and download
+            const blob = new Blob([content], { type: 'application/msword' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Surat_${letter.number}.doc`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
+            showNotification('Surat berhasil dicetak ke Word!', 'success');
+        }
+
+        function printToExcel() {
+            const letterId = document.getElementById('printModal').dataset.letterId;
+            const letter = letters.find(l => l.id == letterId);
+            
+            // Create Excel content (CSV format)
+            const csvContent = `Nomor Surat,Jenis Surat,Pemohon,Status,Tanggal
+${letter.number},"${getLetterTypeName(letter.type)}","${letter.applicant}","${letter.status}","${new Date().toLocaleDateString('id-ID')}"`;
+            
+            // Create blob and download
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Data_Surat_${letter.number}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
+            showNotification('Data surat berhasil diekspor ke Excel!', 'success');
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white smooth-transition`;
+            
+            const bgColor = {
+                'success': 'bg-green-500',
+                'error': 'bg-red-500',
+                'info': 'bg-blue-500',
+                'warning': 'bg-yellow-500'
+            };
+            
+            notification.classList.add(bgColor[type]);
+            notification.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'times' : 'info'}-circle"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Sidebar toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('-translate-x-full');
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('Apakah Anda yakin ingin keluar?')) {
+                showNotification('Anda telah keluar dari sistem', 'info');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            }
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('printModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePrintModal();
+            }
+        });
+
+        // Initialize dashboard on load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(initCharts, 100);
+        });
+
+        // Add smooth transitions to all interactive elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add smooth transitions to all buttons and links
+            document.querySelectorAll('button, a, .card-hover, .nav-item').forEach(element => {
+                element.style.transition = 'all 0.3s ease';
+            });
+        });
+    </script>
 </body>
 </html>
